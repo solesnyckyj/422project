@@ -1,0 +1,116 @@
+
+422 FSEM Whack a Mole
+
+inputs:
+	555t
+	RNG seed
+	Buttons (need debouncing logic for these){
+	RESET button
+	Start button
+	gameinput0
+	gameinput1
+	gameinput2
+	gameinput3
+	gameinput4
+	gameinput5
+	gameinput6
+	gameinput7}
+
+Outputs:
+	Score (bits)
+	win LED
+	Lose LED
+	Game board positional LEDs
+
+
+module Hold
+	//This is the state before the game is started
+	//only input that gets into this state is RESET
+	//only input that gets out of this is start button
+	inputs: RESET
+
+	Functions:
+	clear score
+	reset RNG (set all 7 registers to 0)
+		then reseed
+	clear game states(win/lose)
+
+endmodule
+
+module LFSR
+	inputs:
+		SEED
+		gameinputX
+		555t
+		start
+	theres a bunch of LFSR verilog examples online
+	didnt have time to look for best one
+	but it 
+	only shifts 
+	if 
+	gameinputX
+
+	or
+	555t @ 3s AFTER start button has been pressed
+
+	or 
+	start is pressed in GAME OVER states (win state/lose state)
+
+	IF RESET 
+		MOVE TO HOLD STATE
+endmodule
+
+
+
+
+
+
+module start state
+	//occurs after start button is pressed
+	takes last 3 registers in LFSR 
+		use mux to choose corresponeing game board LED and game board state
+		move to mid game state
+	IF RESET 
+		MOVE TO HOLD STATE
+endmodule
+
+
+
+module mid game state
+	
+	if corresponding gameinputX button is hit for game board LED X AND 555t < 3s
+		if score <= 9
+			score +1
+			shift LFSR
+		if score > 9
+			move to WIN state
+
+	if 555t reaches 3 seconds
+		score = 0
+		move to LOSE state
+
+	IF RESET 
+		MOVE TO HOLD STATE
+endmodule
+
+module LOSE state
+	display no score 
+		(or score = 0)
+	light up LOSE LED
+	if start button
+		move to Start state
+	IF RESET 
+		MOVE TO HOLD STATE
+endmodule
+
+module WIN state
+	display  score 
+	light up WIN LED
+	if start button
+		move to Start state
+	IF RESET 
+		MOVE TO HOLD STATE
+endmodule
+
+
+
